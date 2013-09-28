@@ -88,6 +88,9 @@ ClassGenCCAutoEnabled=1
 ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 
+[GeneratedDocument1]
+DocumentPath=v1_pcb.PCB3D
+
 [OutputGroup1]
 Name=Netlist Outputs
 Description=
