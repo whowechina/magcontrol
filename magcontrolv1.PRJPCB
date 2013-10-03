@@ -111,10 +111,6 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 
 [GeneratedDocument1]
-DocumentPath=v1_pcb.PCB3D
-DItemRevisionGUID=
-
-[GeneratedDocument2]
 DocumentPath=v1_pcb.PCBDOC.htm
 DItemRevisionGUID=
 
