@@ -2,3 +2,9 @@
 Version=1.0
 [Project1]
 ProjectPath=magcontrolv1.PRJPCB
+[Project2]
+ProjectPath=rotenc.PrjPCB
+[Project3]
+ProjectPath=whowe_lib.LibPkg
+[Project4]
+ProjectPath=..\Users\WHowe\AppData\Local\Temp\7zO10C2.tmp\Ôª¼þ·â×°PCB¿â.LibPkg
