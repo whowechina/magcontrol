@@ -12,7 +12,6 @@
 #define POWER_FULL 15
 #define POWER_HOLD 170
 
-
 #define DEADLOOP -1
 
 #define BLINK 1          /* LED blink */
@@ -50,7 +49,7 @@ void delay(int ms)
 	  	  /* NOP */;
 }
 
-void port_init(void)
+void init_port(void)
 {
     PORTB = 0x00;
     DDRB = 0x00;
@@ -181,8 +180,8 @@ void transit_power(byte begin, byte end, int wait)
 void main(void)
 {
     /* Initialize everything */
-    
-    port_init();   
+
+    init_port();   
     init_devices(); 
     init_adc();
 
