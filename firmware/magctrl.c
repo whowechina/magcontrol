@@ -14,11 +14,12 @@
 
 #define DEADLOOP -1
 
-#define BLINK 1          /* LED blink */
-#define NO_BLINK 0       /* LED not blink */
+#define LED_BLINK 1      /* LED blink */
+#define LED_ON 2         /* LED not blink */
+#define LED_OFF 3        /* LED not blink */
 
-#define ADC_ADJ 1        /* Adjust by ADC */
-#define NO_ADC_ADJ 0     /* Not adjust by ADC */
+#define DETECT_LV 1      /* Low-voltage detection */
+#define NO_DETECT_LV 0   /* No Low-voltage detection */
 
 typedef unsigned char byte;
 
@@ -78,7 +79,7 @@ void init_adc(void)
 {
     ADCSRA |= (1 << ADEN) | (1 << ADATE) | (1 << ADPS1) | (1 << ADPS2);
     ADCSRB = 0x00;  /* Free running */
-    ADMUX = (0 << REFS0) | (1 << ADLAR) | (1 << MUX1) | (0 << MUX0); /* PB4 */
+    ADMUX = (0 << REFS0) | (1 << ADLAR) | (0 << MUX1) | (1 << MUX0); /* PB2 */
     DIDR0 = (1 << ADC2D);
     ADCSRA |= (1 << ADSC);  
 }
@@ -124,45 +125,62 @@ void adctest(void)
     }
 }
 
-/* Get ADC adjustments [-47..47] */
-int adc_adjustment(void)
+/* Output constant power level
+   \retval 0 OK
+   \retval -1 Voltage Drop
+*/
+int const_power(byte power, int duration, byte blink, byte lv_detect)
 {
-    int adc;
+    int t, i;
+    byte c, lv;
     
-    adc = ADCH >> 2;
-    adc += (adc >> 1);
+    output(power);
     
-    return adc - 47;
-}
-
-/* Output constant power level */
-void const_power(byte power, int duration, byte blink, byte adc_adj)
-{
-    int t;
-
-	for (t = 0; (t < duration) || (duration == DEADLOOP); t += 100)
-	{
-        if (adc_adj == ADC_ADJ)
-            output(power + adc_adjustment());
-        else
-            output(power);
-
+    if (blink == LED_ON)
         led_on(GREEN);
+    else if (blink == LED_OFF)
+        led_off(GREEN);
         
-	    delay(50);
+    c = 0;
+	for (t = 0; (t < duration) || (duration == DEADLOOP); t += 10)
+	{
+        /* BLINK control */
+        if (blink == LED_BLINK)
+        {
+            if ((c & 0x07) == 0x00)
+               led_on(GREEN);
+            else if ((c & 0x07) == 0x04)
+               led_off(GREEN);
+            
+            c ++;
+        }
         
-        if (blink == BLINK)
-            led_off(GREEN);
-        
-        delay(50);
+        /* Voltage Drop detection */
+        if (lv_detect == DETECT_LV)
+        {
+            lv = 1;
+            for (i = 0; i < 10; i ++)
+  	        {
+                if (ADCH > 0x08)  /* Voltage gate: 0xff: 5v,  0x10: 0.31v */
+                    lv = 0;
+                
+                delay(1);
+            }
+            if (lv == 1)
+                return -1;
+        }
+        else
+        {
+            delay(10);
+        }
     }
+    return 0;
 }
 
 /* Transit from begin level to end level */
 void transit_power(byte begin, byte end, int wait)
 {
-    int i;
-    char step;
+    int i, step;
     
     if (end > begin)
         step = 1;
@@ -189,11 +207,18 @@ void main(void)
     /* adctest(); */
     
     /* Phase 1: use full power level */
-    const_power(POWER_FULL, 1500, NO_BLINK, NO_ADC_ADJ);
+    const_power(POWER_FULL, 1500, LED_ON, NO_DETECT_LV);
     
     /* Phase 2: transit from full level to holding level*/
-    transit_power(POWER_FULL, POWER_HOLD + adc_adjustment(), 1);
+    transit_power(POWER_FULL, POWER_HOLD, 1);
     
     /* Phase 3: Hold on holding level */
-    const_power(POWER_HOLD, DEADLOOP, BLINK, ADC_ADJ);
+    if (const_power(POWER_HOLD, DEADLOOP, LED_BLINK, DETECT_LV) < 0)
+    {
+        /* Recommended steps: 
+           const_power(POWER_ZERO); 
+           delay(sometime, e.g.50ms);
+           const_power(max); */
+        const_power(POWER_HOLD, DEADLOOP, LED_OFF, NO_DETECT_LV);
+    }
 }
