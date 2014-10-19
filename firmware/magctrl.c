@@ -207,18 +207,11 @@ void main(void)
     /* adctest(); */
     
     /* Phase 1: use full power level */
-    const_power(POWER_FULL, 1500, LED_ON, NO_DETECT_LV);
+    const_power(POWER_FULL, 2000, LED_ON, NO_DETECT_LV);
     
     /* Phase 2: transit from full level to holding level*/
     transit_power(POWER_FULL, POWER_HOLD, 1);
     
     /* Phase 3: Hold on holding level */
-    if (const_power(POWER_HOLD, DEADLOOP, LED_BLINK, DETECT_LV) < 0)
-    {
-        /* Recommended steps: 
-           const_power(POWER_ZERO); 
-           delay(sometime, e.g.50ms);
-           const_power(max); */
-        const_power(POWER_HOLD, DEADLOOP, LED_OFF, NO_DETECT_LV);
-    }
+    const_power(POWER_HOLD, DEADLOOP, LED_BLINK, NO_DETECT_LV);
 }
