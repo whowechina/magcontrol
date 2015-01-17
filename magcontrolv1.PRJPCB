@@ -521,7 +521,7 @@ Configuration4_Item3=Comment=True|Footprint=True
 Configuration4_Name4=OutputConfigurationParameter1
 Configuration4_Item4=¿¿?
 Configuration4_Name5=SortOrder
-Configuration4_Item5=Description=Down
+Configuration4_Item5=Description=Up
 Configuration4_Name6=VisibleOrder
 Configuration4_Item6=Comment=103|Description=169|Designator=86|Footprint=86|LibRef=95|Quantity=79
 OutputType5=ComponentCrossReference
