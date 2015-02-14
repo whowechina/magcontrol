@@ -12,7 +12,9 @@ const char fusedata[] __attribute__ ((section (".fuse"))) =
 {0x75, 0xFF};
 const char lockbits[] __attribute__ ((section (".lockbits"))) =
 {0xFC};
-
+const char eeprom[] __attribute__ ((section (".eeprom"))) =
+{0x00, 88};
+	
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
